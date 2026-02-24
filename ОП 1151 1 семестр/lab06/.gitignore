@@ -1,0 +1,20 @@
+# macOS
+.DS_Store
+
+# CMake build folders
+/build/
+/cmake-build-*/
+
+# VSCode (мы будем хранить settings/launch, но игнорим мусор)
+.vscode/*.log
+.vscode/ipch/
+
+# Compile artifacts
+*.o
+*.obj
+*.exe
+*.out
+*.a
+*.lib
+*.dylib
+*.so
