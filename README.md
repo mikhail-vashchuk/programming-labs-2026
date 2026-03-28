@@ -1,4 +1,4 @@
-# Programming Labs 2026
+# Programming Labs
 
 This repository contains my programming labs and study projects.
 
