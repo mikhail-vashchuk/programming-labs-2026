@@ -1,12 +1,14 @@
 #include <iostream>
 #include <cstring>
+#include <cstdio>
 #include <fstream>
 #include <limits>
 #include <algorithm>
+#include <strings.h>
 
-//Structure
+// Structure
 
-struct state {
+struct State {
     char name[30];
     int languageCount;
     char language[30];
@@ -14,7 +16,7 @@ struct state {
     double usdRate;
 };
 
-//Helpful functions
+// Helpful functions
 
 void clearInputLine() {
     std::cin.clear();
@@ -64,151 +66,154 @@ void readLine(char text[], int size) {
     }
 }
 
-//Main Functions - create/delete
+// Main Functions - create/delete
 
-void createFile(const char* fName) {
-    std::ofstream f(fName, std::ios::binary);
-    f.close();
+void createFile(const char* fileName) {
+    std::ofstream file(fileName, std::ios::binary);
+    file.close();
 }
 
-bool deleteFile(const char* fName) {
-    return std::remove(fName) == 0;
+bool deleteFile(const char* fileName) {
+    return std::remove(fileName) == 0;
 }
 
-//If exists
+// If exists
 
-bool fileExists(const char* fName) {
-    std::ifstream f(fName, std::ios::binary);
-    return f.is_open();
+bool fileExists(const char* fileName) {
+    std::ifstream file(fileName, std::ios::binary);
+    return file.is_open();
 }
 
-//Count records in file
+// Count records
 
-int countRecords(const char* fName) {
-    std::ifstream f(fName, std::ios::binary);
+int countRecords(const char* fileName) {
+    std::ifstream file(fileName, std::ios::binary);
 
-    f.seekg(0, std::ios_base::end);
-    int k = f.tellg() / sizeof(state);
-    f.close();
+    file.seekg(0, std::ios_base::end);
+    int k = file.tellg() / sizeof(State);
+    file.close();
 
     return k;
 }
 
-//Read File
+// Read file
 
-void readFile(const char* fName, state st[], int n) {
-    std::ifstream f(fName, std::ios::binary);
+void readFile(const char* fileName, State states[], int n) {
+    std::ifstream file(fileName, std::ios::binary);
 
     for (int i = 0; i < n; i++) {
-        f.read((char*)&st[i], sizeof(st[i]));
+        file.read((char*)&states[i], sizeof(states[i]));
     }
 
-    f.close();
+    file.close();
 }
 
-void enterStruct(state st[], int n) {
+void inputStates(State states[], int n) {
     for (int i = 0; i < n; i++) {
         std::cout << "\nCountry name: ";
-        readLine(st[i].name, 30);
+        readLine(states[i].name, 30);
 
         std::cout << "Official language count: ";
-        st[i].languageCount = readInt();
+        states[i].languageCount = readInt();
 
         std::cout << "Language: ";
-        readLine(st[i].language, 30);
+        readLine(states[i].language, 30);
 
         std::cout << "Currency: ";
-        readLine(st[i].currency, 20);
+        readLine(states[i].currency, 20);
 
         std::cout << "USD rate: ";
-        st[i].usdRate = readDouble();
+        states[i].usdRate = readDouble();
     }
 }
 
-//Write file
+// Write file
 
-void addRecordsToFile(const char* fName, state st[], int n) {
-    std::ofstream f(fName, std::ios::binary | std::ios::app);
+void addRecordsToFile(const char* fileName, const State states[], int n) {
+    std::ofstream file(fileName, std::ios::binary | std::ios::app);
 
     for (int i = 0; i < n; i++) {
-        f.write((char*)&st[i], sizeof(st[i]));
+        file.write((char*)&states[i], sizeof(states[i]));
     }
 
-    f.close();
+    file.close();
 }
 
-//Remove some records from file
+// Remove some records from file
 
-void removeRecordsFromFile(const char* fName, state st[], int n, char (*namesToDelete)[30], int m) {
-    std::ofstream f(fName, std::ios::binary);
+void removeRecordsFromFile(const char* fileName, const State states[], int n, const char (*namesToDelete)[30], int m) {
+    std::ofstream file(fileName, std::ios::binary);
 
     for (int i = 0; i < n; i++) {
-        int o = 0;
+        bool shouldDelete = false;
         for (int j = 0; j < m; j++) {
-            if (std::strcmp (st[i].name, namesToDelete[j]) == 0) {
-                o++;
+            if (std::strcmp (states[i].name, namesToDelete[j]) == 0) {
+                shouldDelete = true;
+                break;
             }
         }
-        if (o > 0) {
+        if (shouldDelete) {
             continue;
         }
         else {
-            f.write((char*)&st[i], sizeof(st[i]));
+            file.write((char*)&states[i], sizeof(states[i]));
         }
     }
     
-     f.close();
+     file.close();
 }
 
-//Print
+// Print
 
-void printRecord(const state& st) {
-    std::cout << "\nCountry: " << st.name;
-    std::cout << "\nOfficial language count: " << st.languageCount;
-    std::cout << "\nLanguage: " << st.language;
-    std::cout << "\nCurrency: " << st.currency;
-    std::cout << "\nUSD rate: " << st.usdRate << "\n";
+void printRecord(const State& state) {
+    std::cout << "\nCountry: " << state.name;
+    std::cout << "\nOfficial language count: " << state.languageCount;
+    std::cout << "\nLanguage: " << state.language;
+    std::cout << "\nCurrency: " << state.currency;
+    std::cout << "\nUSD rate: " << state.usdRate << "\n";
 }
 
 
-void printAllRecords(state st[], int n) {
+void printAllRecords(const State states[], int n) {
     for (int i = 0; i < n; i++) {
-        printRecord(st[i]);
+        printRecord(states[i]);
     }
 }
 
-//Show countries with more than one official language
+// Show countries with more than one official language
 
-void showCountriesWithMoreThanOneLanguage(state st[], int n) {
+void showCountriesWithMoreThanOneLanguage(const State states[], int n) {
     for (int i = 0; i < n; i++) {
-        if (st[i].languageCount > 1) {
-            printRecord(st[i]);
+        if (states[i].languageCount > 1) {
+            printRecord(states[i]);
         }
     }
 }
 
-//Show countries with a low USD exchange rate
+// Show countries with a low USD exchange rate
 
-void findCountriesWithLowUsdRate (state st[], int n, double userrate) {
+void showCountriesWithUsdRateBelow(const State states[], int n, double userRate) {
     for (int i = 0; i < n; i++) {
-        if (st[i].usdRate < userrate) {
-            printRecord(st[i]);
+        if (states[i].usdRate < userRate) {
+            printRecord(states[i]);
         }
     }
 }
 
-//Sort Countries
+// Sort countries
 
-void sortCountries(state st[], int n) {
-    std::sort(st, st + n, [](const state& a, const state& b) {
+void sortCountries(State states[], int n) {
+    std::sort(states, states + n, [](const State& a, const State& b) {
         return strcasecmp(a.name, b.name) < 0;
     });
 }
 
+// Main
+
 int main() {
-    char fName[80];
+    char fileName[80];
     int k = 0;
-    state* st = nullptr;
+    State* states = nullptr;
 
     while (true) {
         std::cout << "\n1: Create file\n";
@@ -217,7 +222,7 @@ int main() {
         std::cout << "4: Delete record(s) from the file\n";
         std::cout << "5: Show all records from the file\n";
         std::cout << "6: Show countries with more than one official language\n";
-        std::cout << "7: Show countries with a low USD exchange rate\n";
+        std::cout << "7: Show countries with a USD rate below a given value\n";
         std::cout << "8: Show countries in alphabetical order\n";
         std::cout << "0: Exit\n";
 
@@ -227,71 +232,71 @@ int main() {
 
             case 1: {
                 std::cout << "\nEnter a file name: ";
-                readLine(fName, 80);
+                readLine(fileName, 80);
 
-                if (fileExists(fName)) {
+                if (fileExists(fileName)) {
                      std::cout << "File with the same name already exists.\n";
                       break;
                 }
 
-                createFile(fName);
-                std::cout << "\nFile " << fName << " created successfully.\n";
+                createFile(fileName);
+                std::cout << "\nFile " << fileName << " created successfully.\n";
                 break;
             }
 
             case 2: {
                 std::cout << "\nEnter a file name: ";
-                readLine(fName, 80);
+                readLine(fileName, 80);
 
-                if (!fileExists(fName)) {
+                if (!fileExists(fileName)) {
                      std::cout << "Error: file does not exist.\n";
                       break;
                 }
 
-                std::cout << "\nEnter the number of states you want to add: ";
+                std::cout << "Enter the number of states you want to add: ";
                 int n = readInt();
 
-                st = new state[n];
+                states = new State[n];
 
-                enterStruct(st, n);
-                addRecordsToFile(fName, st, n);
+                inputStates(states, n);
+                addRecordsToFile(fileName, states, n);
 
                 std::cout << "\nRecords were saved successfully.\n";
 
-                delete[] st;
-                st = nullptr;
+                delete[] states;
+                states = nullptr;
                 
                 break;
             }
 
             case 3: {
                 std::cout << "\nEnter a file name: ";
-                readLine(fName, 80);
+                readLine(fileName, 80);
 
-                if (!fileExists(fName)) {
+                if (!fileExists(fileName)) {
                      std::cout << "Error: file does not exist.\n";
                       break;
                 }
 
-                if(deleteFile(fName)) 
-                std::cout << "File deleted successfully.";
-                else std::cout << "Error. Could not delete file.";
+                if (deleteFile(fileName)) 
+                std::cout << "File deleted successfully.\n";
+                else std::cout << "Error. Could not delete file.\n";
 
                 break;
             }
 
             case 4: {
                 std::cout << "\nEnter a file name: ";
-                readLine(fName, 80);
+                readLine(fileName, 80);
 
-                if (!fileExists(fName)) {
+                if (!fileExists(fileName)) {
                      std::cout << "Error: file does not exist.\n";
                       break;
                 }
 
-                int n = countRecords(fName);
-                st = new state[n];
-                readFile(fName, st, n);
+                int n = countRecords(fileName);
+                states = new State[n];
+                readFile(fileName, states, n);
 
                 std::cout << "Enter a number of records you want to remove: ";
                 int m = readInt();
@@ -302,10 +307,11 @@ int main() {
                      readLine(namesToDelete[i], 30);
                 }
 
-                removeRecordsFromFile(fName, st, n, namesToDelete, m);
+                removeRecordsFromFile(fileName, states, n, namesToDelete, m);
+                std::cout << "Records were processed successfully.\n";
 
-                delete[] st;
-                st = nullptr;
+                delete[] states;
+                states = nullptr;
                 delete[] namesToDelete;
                 namesToDelete = nullptr;
 
@@ -314,91 +320,91 @@ int main() {
 
             case 5: {
                 std::cout << "\nEnter a file name: ";
-                readLine(fName, 80);
+                readLine(fileName, 80);
 
-                if (!fileExists(fName)) {
+                if (!fileExists(fileName)) {
                      std::cout << "Error: file does not exist.\n";
                       break;
                 }
                 
-                int n = countRecords(fName);
-                st = new state[n];
-                readFile(fName, st, n);
+                int n = countRecords(fileName);
+                states = new State[n];
+                readFile(fileName, states, n);
 
                 std::cout << "All records from the file:\n";
-                printAllRecords(st, n);
+                printAllRecords(states, n);
                 
-                delete[] st;
-                st = nullptr;
+                delete[] states;
+                states = nullptr;
 
                 break;
             }
 
             case 6: {
                 std::cout << "\nEnter a file name: ";
-                readLine(fName, 80);
+                readLine(fileName, 80);
 
-                if (!fileExists(fName)) {
+                if (!fileExists(fileName)) {
                      std::cout << "Error: file does not exist.\n";
                       break;
                 }
 
-                int n = countRecords(fName);
-                st = new state[n];
-                readFile(fName, st, n);
+                int n = countRecords(fileName);
+                states = new State[n];
+                readFile(fileName, states, n);
 
                 std::cout << "Countries with more than one official language:\n";
-                showCountriesWithMoreThanOneLanguage(st, n);
+                showCountriesWithMoreThanOneLanguage(states, n);
                 
-                delete[] st;
-                st = nullptr;
+                delete[] states;
+                states = nullptr;
 
                 break;
             }
 
             case 7: {
                 std::cout << "\nEnter a file name: ";
-                readLine(fName, 80);
+                readLine(fileName, 80);
 
-                if (!fileExists(fName)) {
+                if (!fileExists(fileName)) {
                      std::cout << "Error: file does not exist.\n";
                       break;
                 }
 
-                int n = countRecords(fName);
-                st = new state[n];
-                readFile(fName, st, n);
+                int n = countRecords(fileName);
+                states = new State[n];
+                readFile(fileName, states, n);
 
-                std::cout << "Enter the USD exchange rate: ";
-                double userrate = readDouble();
-                std::cout << "Countries lower USD exchange rate:\n";
-                findCountriesWithLowUsdRate(st, n, userrate);
+                std::cout << "Enter the maximum USD rate: ";
+                double userRate = readDouble();
+                std::cout << "Countries with a USD rate below " << userRate << ":\n";
+                showCountriesWithUsdRateBelow(states, n, userRate);
                 
-                delete[] st;
-                st = nullptr;
+                delete[] states;
+                states = nullptr;
 
                 break;
             }
 
             case 8: {
                 std::cout << "\nEnter a file name: ";
-                readLine(fName, 80);
+                readLine(fileName, 80);
 
-                if (!fileExists(fName)) {
+                if (!fileExists(fileName)) {
                      std::cout << "Error: file does not exist.\n";
                       break;
                 }
 
-                int n = countRecords(fName);
-                st = new state[n];
-                readFile(fName, st, n);
+                int n = countRecords(fileName);
+                states = new State[n];
+                readFile(fileName, states, n);
 
                 std::cout << "Countries in alphabetical order:\n";
-                sortCountries(st, n);
-                printAllRecords(st, n);
+                sortCountries(states, n);
+                printAllRecords(states, n);
                 
-                delete[] st;
-                st = nullptr;
+                delete[] states;
+                states = nullptr;
 
                 break;
             }
