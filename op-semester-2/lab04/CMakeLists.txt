@@ -1,23 +1,21 @@
 cmake_minimum_required(VERSION 3.20)
 
-# Переименуй тут проект один раз — и всё
-project(lab04 LANGUAGES CXX)
+project(lab04 VERSION 1.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Аккуратные предупреждения (кроссплатформенно)
-if (MSVC)
-  add_compile_options(/W4)
+if(MSVC)
+    add_compile_options(/W4)
 else()
-  add_compile_options(-Wall -Wextra -Wpedantic)
+    add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-add_executable(app
-  src/main.cpp
+add_executable(${PROJECT_NAME}
+    src/main.cpp
 )
 
-target_include_directories(app PRIVATE
-  ${CMAKE_CURRENT_SOURCE_DIR}/include
+target_include_directories(${PROJECT_NAME} PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
